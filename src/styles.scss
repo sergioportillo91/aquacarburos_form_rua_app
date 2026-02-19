@@ -1,0 +1,38 @@
+/* You can add global styles to this file, and also import other style files */
+@import 'primeicons/primeicons.css';
+@import 'primeflex/primeflex.css';
+
+// Toast styles - tamaño de mensajes más grande
+.p-toast {
+  .p-toast-message {
+    min-width: 24rem;
+    max-width: 32rem;
+  }
+
+  .p-toast-message-content {
+    padding: 1.25rem 1.5rem;
+    gap: 1rem;
+    align-items: flex-start;
+  }
+
+  .p-toast-message-icon {
+    font-size: 1.75rem;
+  }
+
+  .p-toast-summary {
+    font-size: 1.15rem;
+    font-weight: 600;
+  }
+
+  .p-toast-detail {
+    font-size: 1.05rem;
+    line-height: 1.5;
+    margin-top: 0.35rem;
+  }
+
+  .p-toast-icon-close {
+    width: 2rem;
+    height: 2rem;
+    font-size: 1rem;
+  }
+}

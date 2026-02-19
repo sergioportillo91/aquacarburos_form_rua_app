@@ -1,0 +1,46 @@
+:host {
+  display: block;
+}
+
+.logo {
+  width: 4rem;
+  height: 4rem;
+  object-fit: contain;
+}
+
+:host ::ng-deep .p-fileupload-basic {
+  flex-shrink: 0;
+}
+
+:host ::ng-deep .p-fileupload-basic .p-button {
+  justify-content: flex-start;
+  text-align: left;
+}
+
+.file-name {
+  display: flex;
+  align-items: center;
+  background-color: #f0fdf4;
+  border: 1px solid #22c55e;
+  border-radius: 6px;
+  padding: 0.5rem 0.75rem;
+  gap: 0.5rem;
+  flex: 1;
+  min-width: 0;
+
+  .pi-file {
+    color: #22c55e;
+    font-size: 1rem;
+    flex-shrink: 0;
+  }
+}
+
+.file-name-text {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: #166534;
+  font-weight: 500;
+  font-size: 0.875rem;
+}
+

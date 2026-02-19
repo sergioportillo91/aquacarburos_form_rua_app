@@ -1,0 +1,252 @@
+<p-toast position="top-right"></p-toast>
+
+<div class="surface-50 text-800 min-h-screen flex flex-column" style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; font-size: 0.95rem; line-height: 1.6;">
+  <header class="sticky top-0 z-5 surface-card border-bottom-1 border-200">
+    <div class="max-w-screen-xl mx-auto p-3 md:p-4 flex align-items-center gap-3">
+      <img src="logo.png" alt="Logo" class="logo" />
+      <h1 class="m-0 text-lg md:text-2xl font-bold text-center flex-1" style="letter-spacing: -0.5px; font-weight: 700; line-height: 1.3;">
+        Registro Único Ambiental (RUA) para el establecimiento e implementación del
+        Registro de Emisiones y Transferencia de Contaminantes (RETC)
+      </h1>
+      <div class="pt-4">
+        <button
+          pButton
+          type="button"
+          [icon]="isDarkMode ? 'pi pi-sun' : 'pi pi-moon'"
+          [text]="true"
+          [rounded]="true"
+          severity="success"
+          [attr.aria-label]="isDarkMode ? 'Cambiar a tema claro' : 'Cambiar a tema oscuro'"
+          [attr.title]="isDarkMode ? 'Cambiar a tema claro' : 'Cambiar a tema oscuro'"
+          (click)="toggleDarkMode()"
+        ></button>
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-screen-xl mx-auto p-3 md:p-4 w-full flex-1">
+    <form #ruaForm="ngForm" (ngSubmit)="onSubmit(ruaForm)" class="flex flex-column gap-3">
+      <section class="surface-card border-1 border-200 border-round p-3 md:p-4">
+        <h2 class="text-xl font-semibold mt-0 mb-3" style="letter-spacing: -0.3px; font-weight: 600; line-height: 1.4;">Datos básicos</h2>
+        <div class="grid">
+          <div class="col-12 md:col-6" *ngFor="let field of basicFields">
+            <label class="block font-medium mb-2" [for]="field.name" style="font-size: 0.95rem;">{{ field.label }}<span class="text-red-500"> *</span></label>
+
+            <ng-container [ngSwitch]="field.type">
+              <p-password
+                *ngSwitchCase="'password'"
+                [inputId]="field.name"
+                [name]="field.name"
+                [placeholder]="field.placeholder || ''"
+                [toggleMask]="true"
+                [feedback]="false"
+                styleClass="w-full"
+                inputStyleClass="w-full"
+                [(ngModel)]="formData[field.name]"
+                (ngModelChange)="onTextValueChange(field, $event)"
+                [required]="field.required"
+              ></p-password>
+
+              <p-datepicker
+                *ngSwitchCase="'date'"
+                [inputId]="field.name"
+                [name]="field.name"
+                dateFormat="yy-mm-dd"
+                [showIcon]="true"
+                appendTo="body"
+                styleClass="w-full"
+                inputStyleClass="w-full"
+                [(ngModel)]="formData[field.name]"
+                [required]="field.required"
+              ></p-datepicker>
+
+              <p-inputNumber
+                *ngSwitchCase="'number'"
+                [inputId]="field.name"
+                [name]="field.name"
+                [placeholder]="field.placeholder || ''"
+                [useGrouping]="false"
+                [maxFractionDigits]="field.step === '0.01' ? 2 : 0"
+                styleClass="w-full"
+                inputStyleClass="w-full"
+                [(ngModel)]="formData[field.name]"
+                [required]="field.required"
+              ></p-inputNumber>
+
+              <input
+                *ngSwitchDefault
+                pInputText
+                class="w-full"
+                [id]="field.name"
+                [name]="field.name"
+                [type]="field.type"
+                [step]="field.step || null"
+                [placeholder]="field.placeholder || ''"
+                [(ngModel)]="formData[field.name]"
+                (ngModelChange)="onTextValueChange(field, $event)"
+                (keydown)="onFieldKeyDown(field, $event)"
+                (paste)="onFieldPaste(field, $event)"
+                [required]="field.required"
+                [attr.pattern]="field.pattern"
+              />
+            </ng-container>
+
+            <small
+              class="block mt-2 text-red-500"
+              *ngIf="isMissingRequired(field) && (ruaForm.submitted || ruaForm.controls[field.name]?.touched)"
+            >
+              Campo obligatorio
+            </small>
+            <small
+              class="block mt-2 text-red-500"
+              *ngIf="field.pattern && ruaForm.controls[field.name]?.errors?.['pattern'] && (ruaForm.submitted || ruaForm.controls[field.name]?.touched)"
+            >
+              {{ field.patternMessage || 'Formato inválido' }}
+            </small>
+          </div>
+        </div>
+      </section>
+
+      <section class="surface-card border-1 border-200 border-round p-3 md:p-4">
+        <h2 class="text-xl font-semibold mt-0 mb-3" style="letter-spacing: -0.3px; font-weight: 600; line-height: 1.4;">Campos generales</h2>
+        <div class="grid">
+          <div class="col-12 md:col-6" *ngFor="let field of generalFields">
+            <label class="block font-medium mb-2" [for]="field.name" style="font-size: 0.95rem;">{{ field.label }}<span class="text-red-500"> *</span></label>
+
+            <ng-container [ngSwitch]="field.type">
+              <p-dropdown
+                *ngSwitchCase="'select'"
+                [inputId]="field.name"
+                [name]="field.name"
+                [options]="field.options || []"
+                optionLabel="label"
+                optionValue="value"
+                [placeholder]="field.label"
+                styleClass="w-full"
+                [(ngModel)]="formData[field.name]"
+                [required]="field.required"
+              ></p-dropdown>
+
+              <p-inputNumber
+                *ngSwitchCase="'number'"
+                [inputId]="field.name"
+                [name]="field.name"
+                [placeholder]="field.placeholder || ''"
+                [useGrouping]="false"
+                [maxFractionDigits]="field.step === '0.01' ? 2 : 0"
+                styleClass="w-full"
+                inputStyleClass="w-full"
+                [(ngModel)]="formData[field.name]"
+                [required]="field.required"
+              ></p-inputNumber>
+
+              <p-datepicker
+                *ngSwitchCase="'date'"
+                [inputId]="field.name"
+                [name]="field.name"
+                dateFormat="yy-mm-dd"
+                [showIcon]="true"
+                appendTo="body"
+                styleClass="w-full"
+                inputStyleClass="w-full"
+                [(ngModel)]="formData[field.name]"
+                [required]="field.required"
+              ></p-datepicker>
+
+              <p-password
+                *ngSwitchCase="'password'"
+                [inputId]="field.name"
+                [name]="field.name"
+                [placeholder]="field.placeholder || ''"
+                [toggleMask]="true"
+                [feedback]="false"
+                styleClass="w-full"
+                inputStyleClass="w-full"
+                [(ngModel)]="formData[field.name]"
+                (ngModelChange)="onTextValueChange(field, $event)"
+                [required]="field.required"
+              ></p-password>
+
+              <input
+                *ngSwitchDefault
+                pInputText
+                class="w-full"
+                [id]="field.name"
+                [name]="field.name"
+                [type]="field.type"
+                [step]="field.step || null"
+                [placeholder]="field.placeholder || ''"
+                [(ngModel)]="formData[field.name]"
+                (ngModelChange)="onTextValueChange(field, $event)"
+                (keydown)="onFieldKeyDown(field, $event)"
+                (paste)="onFieldPaste(field, $event)"
+                [required]="field.required"
+                [attr.pattern]="field.pattern"
+              />
+            </ng-container>
+
+            <small
+              class="block mt-2 text-red-500"
+              *ngIf="isMissingRequired(field) && (ruaForm.submitted || ruaForm.controls[field.name]?.touched)"
+            >
+              Campo obligatorio
+            </small>
+            <small
+              class="block mt-2 text-red-500"
+              *ngIf="field.pattern && ruaForm.controls[field.name]?.errors?.['pattern'] && (ruaForm.submitted || ruaForm.controls[field.name]?.touched)"
+            >
+              {{ field.patternMessage || 'Formato inválido' }}
+            </small>
+          </div>
+        </div>
+      </section>
+
+      <section class="surface-card border-1 border-200 border-round p-3 md:p-4">
+        <h2 class="text-xl font-semibold mt-0 mb-3" style="letter-spacing: -0.3px; font-weight: 600; line-height: 1.4;">Documentos (PDF/Word, máx 5MB)</h2>
+        <div class="grid">
+          <div class="col-12 md:col-6" *ngFor="let doc of documentFields">
+            <label class="block font-medium mb-2" [for]="doc.key" style="font-size: 0.95rem;">{{ doc.label }}<span class="text-red-500"> *</span></label>
+            <div class="flex align-items-center gap-2 flex-wrap">
+              <p-fileUpload
+                mode="basic"
+                chooseIcon="pi pi-upload"
+                chooseLabel="Seleccionar archivo"
+                [name]="doc.key + 'File'"
+                [accept]="acceptedFileTypes"
+                [maxFileSize]="5242880"
+                [customUpload]="true"
+                [auto]="true"
+                [multiple]="false"
+                (onSelect)="onPrimeFileSelect(doc.key, $event)"
+                (onClear)="onFileClear(doc.key)"
+              ></p-fileUpload>
+              <div class="file-name" *ngIf="docFileNames[doc.key]">
+                <i class="pi pi-file"></i>
+                <span class="file-name-text" [title]="docFileNames[doc.key]">{{ docFileNames[doc.key] }}</span>
+              </div>
+            </div>
+            <small class="block mt-2 text-600">Acepta PDF, DOC o DOCX. Máximo 5MB.</small>
+            <small class="block mt-1 text-red-500">{{ docErrors[doc.key] }}</small>
+          </div>
+        </div>
+      </section>
+
+      <div class="flex flex-column align-items-center gap-2">
+        <button
+          pButton
+          type="submit"
+          [label]="submitting ? 'Enviando...' : 'Enviar datos'"
+          [icon]="submitting ? 'pi pi-spin pi-spinner' : 'pi pi-save'"
+          [disabled]="submitting || !isFormReady(ruaForm)"
+        ></button>
+        <small [class]="statusType === 'ok' ? 'text-green-600' : statusType === 'error' ? 'text-red-600' : 'text-600'">{{ statusMessage }}</small>
+      </div>
+    </form>
+  </main>
+
+  <footer class="surface-card border-top-1 border-200 mt-auto">
+    <div class="max-w-screen-xl mx-auto px-4 py-3 text-center text-sm text-700" style="font-size: 0.85rem; letter-spacing: 0.3px;">
+      Todos los derechos reservados a Aquacarburos 2026
+    </div>
+  </footer>
+</div>
