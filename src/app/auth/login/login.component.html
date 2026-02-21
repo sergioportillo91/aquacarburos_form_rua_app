@@ -1,0 +1,79 @@
+<p-toast position="top-right"></p-toast>
+
+<div class="surface-50 text-800 min-h-screen flex flex-column" style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
+  <header class="sticky top-0 z-5 surface-card border-bottom-1 border-200">
+    <div class="max-w-screen-xl mx-auto p-3 md:p-4 flex align-items-center gap-3">
+      <img src="logo.png" alt="Logo" class="logo" />
+      <h1 class="m-0 text-lg md:text-2xl font-bold text-center flex-1" style="letter-spacing: -0.5px; font-weight: 700; line-height: 1.3;">
+        Registro Único Ambiental (RUA)
+      </h1>
+    </div>
+  </header>
+
+  <main class="flex-1 flex align-items-center justify-content-center p-4">
+    <div class="login-container surface-card border-1 border-200 border-round p-4 md:p-5 w-full" style="max-width: 420px;">
+      <div class="text-center mb-4">
+        <i class="pi pi-user text-5xl text-primary mb-3"></i>
+        <h2 class="text-2xl font-semibold mt-0 mb-2" style="letter-spacing: -0.3px;">Iniciar Sesión</h2>
+        <p class="text-600 m-0">Ingresa tus credenciales para acceder al sistema</p>
+      </div>
+
+      <form #loginForm="ngForm" (ngSubmit)="onSubmit()" class="flex flex-column gap-4">
+        <div class="flex flex-column gap-2">
+          <label for="usuario" class="font-medium">Usuario <span class="text-red-500">*</span></label>
+          <span class="p-input-icon-left w-full">
+            <i class="pi pi-user"></i>
+            <input 
+              pInputText
+              id="usuario"
+              name="usuario"
+              type="text"
+              class="w-full"
+              placeholder="Ingresa tu usuario"
+              [(ngModel)]="credentials.usuario"
+              required
+              autocomplete="username"
+            />
+          </span>
+        </div>
+
+        <div class="flex flex-column gap-2">
+          <label for="clave" class="font-medium">Contraseña <span class="text-red-500">*</span></label>
+          <p-password
+            inputId="clave"
+            name="clave"
+            placeholder="Ingresa tu contraseña"
+            [toggleMask]="true"
+            [feedback]="false"
+            styleClass="w-full"
+            inputStyleClass="w-full"
+            [(ngModel)]="credentials.clave"
+            required
+            autocomplete="current-password"
+          ></p-password>
+        </div>
+
+        <button 
+          pButton
+          type="submit"
+          label="Iniciar Sesión"
+          icon="pi pi-sign-in"
+          class="w-full mt-2"
+          [loading]="isLoading"
+          [disabled]="isLoading"
+        ></button>
+      </form>
+
+      <div class="text-center mt-4">
+        <small class="text-500">
+          <i class="pi pi-lock mr-1"></i>
+          Conexión segura
+        </small>
+      </div>
+    </div>
+  </main>
+
+  <footer class="surface-card border-top-1 border-200 p-3 text-center">
+    <small class="text-500">© 2026 - Sistema de Registro Único Ambiental (RUA)</small>
+  </footer>
+</div>

@@ -1,9 +1,10 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpErrorResponse } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
 import { Observable, throwError, timeout, TimeoutError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { environment } from '../../../environments/environment';
 import { FormRuaPayload, FormRuaResponse } from '../models/form-rua.model';
+import { AuthService } from '../../auth/services/auth.service';
 
 @Injectable({
   providedIn: 'root'
@@ -12,7 +13,17 @@ export class FormRuaService {
   private readonly apiUrl = environment.apiUrl;
   private readonly requestTimeoutMs = 60000;
 
-  constructor(private readonly http: HttpClient) {}
+  constructor(
+    private readonly http: HttpClient,
+    private readonly authService: AuthService
+  ) {}
+
+  private getAuthHeaders(): HttpHeaders {
+    const token = this.authService.getToken();
+    return new HttpHeaders({
+      Authorization: token ? `Bearer ${token}` : ''
+    });
+  }
 
   /**
    * Envía los datos del formulario RUA al servidor
@@ -20,7 +31,9 @@ export class FormRuaService {
    * @returns Observable con la respuesta del servidor
    */
   submit(payload: FormRuaPayload): Observable<FormRuaResponse> {
-    return this.http.post<FormRuaResponse>(this.apiUrl, payload).pipe(
+    return this.http.post<FormRuaResponse>(this.apiUrl, payload, {
+      headers: this.getAuthHeaders()
+    }).pipe(
       timeout(this.requestTimeoutMs),
       catchError((error: unknown) => this.handleError(error))
     );

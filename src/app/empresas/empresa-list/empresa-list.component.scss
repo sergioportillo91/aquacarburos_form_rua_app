@@ -1,0 +1,55 @@
+:host {
+  display: block;
+}
+
+.logo {
+  width: 4rem;
+  height: 4rem;
+  object-fit: contain;
+}
+
+:host ::ng-deep {
+  .p-datatable {
+    .p-datatable-header {
+      background: transparent;
+      border: none;
+      padding: 0;
+    }
+
+    .p-datatable-thead > tr > th {
+      background: var(--surface-100);
+      font-weight: 600;
+    }
+  }
+
+  .p-dialog {
+    .p-dialog-header {
+      padding-bottom: 0.5rem;
+    }
+
+    .p-dialog-content {
+      padding-top: 0.5rem;
+    }
+  }
+
+  .p-input-icon-left {
+    display: flex;
+    align-items: center;
+    position: relative;
+
+    > i {
+      position: absolute;
+      left: 0.75rem;
+      color: var(--text-color-secondary);
+      z-index: 1;
+    }
+
+    > input {
+      padding-left: 2.5rem;
+    }
+  }
+
+  .p-password {
+    width: 100%;
+  }
+}

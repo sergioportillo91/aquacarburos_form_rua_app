@@ -1,0 +1,56 @@
+:host {
+  display: block;
+}
+
+.logo {
+  width: 4rem;
+  height: 4rem;
+  object-fit: contain;
+}
+
+.login-container {
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+}
+
+:host ::ng-deep {
+  .p-password {
+    width: 100%;
+  }
+
+  .p-password-input {
+    width: 100%;
+  }
+
+  .p-input-icon-left {
+    display: flex;
+    align-items: center;
+    position: relative;
+
+    > i {
+      position: absolute;
+      left: 0.75rem;
+      color: var(--text-color-secondary);
+      z-index: 1;
+    }
+
+    > input {
+      padding-left: 2.5rem;
+    }
+  }
+}
+
+// Animación sutil para el contenedor de login
+.login-container {
+  animation: fadeInUp 0.4s ease-out;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

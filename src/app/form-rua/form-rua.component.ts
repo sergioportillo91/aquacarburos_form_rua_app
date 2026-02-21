@@ -1,6 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
 import { FormsModule, NgForm } from '@angular/forms';
+import { Router } from '@angular/router';
 import { firstValueFrom } from 'rxjs';
 import { ButtonModule } from 'primeng/button';
 import { DatePickerModule } from 'primeng/datepicker';
@@ -9,10 +10,13 @@ import { FileUploadModule } from 'primeng/fileupload';
 import { InputNumberModule } from 'primeng/inputnumber';
 import { InputTextModule } from 'primeng/inputtext';
 import { PasswordModule } from 'primeng/password';
+import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { ToastModule } from 'primeng/toast';
-import { MessageService } from 'primeng/api';
+import { MessageService, ConfirmationService } from 'primeng/api';
 import { FormRuaService } from './services/form-rua.service';
 import { FormField, DocumentField, FormRuaPayload } from './models/form-rua.model';
+import { AuthService } from '../auth/services/auth.service';
+import { UserSession } from '../auth/models/auth.model';
 
 @Component({
   selector: 'app-form-rua',
@@ -23,13 +27,14 @@ import { FormField, DocumentField, FormRuaPayload } from './models/form-rua.mode
     InputTextModule,
     InputNumberModule,
     DatePickerModule,
+    ConfirmDialogModule,
     DropdownModule,
     FileUploadModule,
     PasswordModule,
     ButtonModule,
     ToastModule
   ],
-  providers: [MessageService],
+  providers: [MessageService, ConfirmationService],
   templateUrl: './form-rua.component.html',
   styleUrl: './form-rua.component.scss'
 })
@@ -43,11 +48,13 @@ export class FormRuaComponent {
   ];
 
   readonly acceptedFileTypes = '.pdf,.doc,.docx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document';
+
+  readonly fileLabel = 'Solo se acepta PDF (máx. 5MB)';
   isDarkMode = false;
 
   readonly basicFields: FormField[] = [
-    { name: 'nit', label: 'NIT (sin dígito de verificación y sin puntos ni comas)', placeholder: 'NIT', type: 'text', required: true },
-    { name: 'nombreEmpresa', label: 'Nombre de la empresa', placeholder: 'Nombre de la empresa', type: 'text', required: true },
+    { name: 'nit', label: 'NIT (sin dígito de verificación y sin puntos ni comas)', placeholder: 'NIT', type: 'text', required: true, disabled: true },
+    { name: 'nombreEmpresa', label: 'Nombre de la empresa', placeholder: 'Nombre de la empresa', type: 'text', required: true, disabled: true },
     { name: 'direccion', label: 'Dirección', placeholder: 'Dirección', type: 'text', required: true },
     { name: 'telefono', label: 'Teléfono', placeholder: 'Teléfono', type: 'text', required: true },
     { name: 'correo', label: 'Correo', placeholder: 'ejemplo@dominio.com', type: 'email', required: true, pattern: String.raw`^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$`, patternMessage: 'Ingresa un correo válido (ej: usuario@dominio.com)' },
@@ -94,10 +101,10 @@ export class FormRuaComponent {
         { label: 'No', value: 'NO' }
       ]
     },
-    { name: 'ventasCombustibleGalonesAnoMiles', label: 'Ventas combustible', placeholder: 'Ventas combustible', type: 'text', required: true },
-    { name: 'comprasCombustibleGalonesAnoMiles', label: 'Compras combustible', placeholder: 'Compras combustible', type: 'text', required: true },
+    { name: 'ventasCombustibleGalonesAnoMiles', label: 'Ventas combustible (galones)', placeholder: 'Ventas combustible (galones)', type: 'text', required: true },
+    { name: 'comprasCombustibleGalonesAnoMiles', label: 'Compras combustible (galones)', placeholder: 'Compras combustible (galones)', type: 'text', required: true },
     { name: 'existenciasCombustible31Diciembre', label: 'Existencias al 31 dic', placeholder: 'Existencias al 31 dic', type: 'text', required: true },
-    { name: 'otrasMateriasPrimasAceitesConsumiblesUreaComprasVentas', label: 'Otras materias primas', placeholder: 'Otras materias primas', type: 'text', required: true },
+    { name: 'otrasMateriasPrimasAceitesConsumiblesUreaComprasVentas', label: 'Otras materias primas y sus cantidades', placeholder: 'Otras materias primas', type: 'text', required: true },
     { name: 'consumoAnualEnergiaElectricaKwh', label: 'Consumo anual energía', placeholder: 'Consumo anual energía', type: 'text', required: true },
     { name: 'equiposCombustionDescripcion', label: 'Equipos combustión', placeholder: 'Equipos combustión', type: 'text', required: true },
     { name: 'nombreEquipo', label: 'Nombre equipo', placeholder: 'Nombre equipo', type: 'text', required: true },
@@ -134,11 +141,11 @@ export class FormRuaComponent {
     { name: 'claseVertimientoDescarga', label: 'Clase vertimiento', placeholder: 'Clase vertimiento', type: 'text', required: true },
     { name: 'periodoDescargaDiasAno', label: 'Periodo descarga (días/año)', placeholder: 'Periodo descarga (días/año)', type: 'text', required: true },
     { name: 'horasVertimientoPeriodoBalance', label: 'Horas vertimiento', placeholder: 'Horas vertimiento', type: 'text', required: true },
-    { name: 'volumenMensualVertidoM3', label: 'Volumen mensual vertido', placeholder: 'Volumen mensual vertido', type: 'text', required: true },
+    { name: 'volumenMensualVertidoM3', label: 'Volumen mensual vertido (m3 )', placeholder: 'Volumen mensual vertido (m3 )', type: 'text', required: true },
     { name: 'metodoDeterminacionVolumenVertido', label: 'Método determinación volumen', placeholder: 'Método determinación volumen', type: 'text', required: true },
     {
       name: 'tieneSistemaTratamiento',
-      label: '¿Tiene sistema?',
+      label: '¿Tiene sistema de tratamiento?',
       type: 'select',
       required: true,
       options: [
@@ -147,12 +154,13 @@ export class FormRuaComponent {
         { label: 'No', value: 'false' }
       ]
     },
-    { name: 'volumenTotalTratadoAnualM3', label: 'Volumen tratado anual', placeholder: 'Volumen tratado anual', type: 'text', required: true },
+    { name: 'volumenTotalTratadoAnualM3', label: 'Volumen total tratado anual (m3)', placeholder: 'Volumen total tratado anual (m3)', type: 'text', required: true },
     { name: 'sistemaTratamiento', label: 'Sistema tratamiento', placeholder: 'Sistema tratamiento', type: 'text', required: true },
     { name: 'informeCaracterizacion', label: 'Informe caracterización', placeholder: 'Informe caracterización', type: 'text', required: true },
     { name: 'sistemaTratamientoAguasResiduales', label: 'Sistema tratamiento aguas', placeholder: 'Sistema tratamiento aguas', type: 'text', required: true },
-    { name: 'trampaGrasasCaudal', label: 'Trampa grasas caudal', placeholder: 'Trampa grasas caudal', type: 'text', required: true },
-    { name: 'caudalEntradaSalidaLs', label: 'Caudal entrada/salida', placeholder: 'Caudal entrada/salida', type: 'text', required: true },
+    { name: 'trampaGrasasCaudal', label: 'Trampa grasas caudal (l/s)', placeholder: 'Trampa grasas caudal (l/s)', type: 'text', required: true },
+    { name: 'caudalEntradaLs', label: 'Caudal entrada', placeholder: 'Caudal entrada', type: 'text', required: true },
+    { name: 'caudalSalidaLs', label: 'Caudal salida', placeholder: 'Caudal salida', type: 'text', required: true },
     { name: 'pozoSepticoEntradaSalidaAgua', label: 'Pozo séptico entrada/salida', placeholder: 'Pozo séptico entrada/salida', type: 'text', required: true },
     { name: 'reporteFiltrosContaminados', label: 'Reporte filtros', placeholder: 'Reporte filtros', type: 'text', required: true },
     { name: 'reporteTraposAbsorbentesContaminados', label: 'Reporte trapos/absorbentes', placeholder: 'Reporte trapos/absorbentes', type: 'text', required: true },
@@ -187,7 +195,7 @@ export class FormRuaComponent {
     { key: 'certificadoGeneradorRespel2025', label: 'Certificado de generador de RESPEL año 2025' },
     { key: 'contratoGestorResiduosPeligrosos', label: 'Contrato con gestor de residuos peligrosos' },
     { key: 'documentoSoportePdf', label: 'Documento soporte (PDF)' },
-    { key: 'tipoVertimientoDocumento', label: 'Tipo de vertimiento (suelo / alcantarillado)' },
+    { key: 'tipoVertimientoDocumento', label: 'Permiso de vertimiento (suelo / alcantarillado)' },
     { key: 'permisoVertimientosDocumento', label: 'Permiso de vertimientos (vigente / en trámite)' },
     { key: 'radicadoTramiteVertimientosDocumento', label: 'Radicado del trámite de vertimientos' },
     { key: 'caracterizacionVertimientosDocumento', label: 'Caracterización de vertimientos' },
@@ -207,12 +215,25 @@ export class FormRuaComponent {
   statusType: '' | 'ok' | 'error' = '';
   submitting = false;
 
+  currentUser: UserSession | null = null;
+  isAdmin = false;
+
   constructor(
     private readonly formRuaService: FormRuaService,
-    private readonly messageService: MessageService
+    private readonly messageService: MessageService,
+    private readonly authService: AuthService,
+    private readonly router: Router,
+    private readonly confirmationService: ConfirmationService
   ) {
+    this.currentUser = this.authService.getCurrentUser();
     [...this.basicFields, ...this.generalFields].forEach((field) => {
-      this.formData[field.name] = null;
+      if (field.name === 'nit' && this.currentUser?.nit) {
+        this.formData[field.name] = this.currentUser.nit;
+      } else if (field.name === 'nombreEmpresa' && this.currentUser?.nombreEmpresa) {
+        this.formData[field.name] = this.currentUser.nombreEmpresa;
+      } else {
+        this.formData[field.name] = null;
+      }
     });
 
     this.documentFields.forEach((field) => {
@@ -221,15 +242,26 @@ export class FormRuaComponent {
       this.docFileNames[field.key] = '';
     });
 
-    this.isDarkMode = localStorage.getItem(this.darkModeStorageKey) === 'true';
-    this.applyDarkMode(this.isDarkMode);
+    this.isAdmin = this.currentUser?.rol === 'ROL_ADMIN';
   }
 
-  toggleDarkMode(): void {
-    this.isDarkMode = !this.isDarkMode;
-    this.applyDarkMode(this.isDarkMode);
-    localStorage.setItem(this.darkModeStorageKey, String(this.isDarkMode));
+  logout(): void {
+    this.confirmationService.confirm({
+      message: '¿Estás seguro que deseas cerrar sesión?',
+      header: 'Confirmar',
+      icon: 'pi pi-exclamation-triangle',
+      acceptLabel: 'Si',
+      rejectLabel: 'No',
+      accept: () => {
+        this.authService.logout();
+      }
+    });
   }
+
+  goToEmpresas(): void {
+    this.router.navigate(['/empresas']);
+  }
+
 
   onNitInput(): void {
     const nitValue = String(this.formData['nit'] ?? '') || '';
@@ -301,15 +333,18 @@ export class FormRuaComponent {
       return;
     }
 
-    const sanitized = String(value ?? '').replace(/\s+/g, '');
-    this.formData[field.name] = sanitized;
-
+    // Permitir espacios en todos los campos excepto NIT
     if (field.name === 'nit') {
+      const sanitized = String(value ?? '').replace(/\D/g, '');
+      this.formData[field.name] = sanitized;
       this.onNitInput();
+    } else {
+      this.formData[field.name] = value;
     }
   }
 
   onFieldKeyDown(field: FormField, event: KeyboardEvent): void {
+    // Solo restringir caracteres en el campo NIT, permitir espacios en los demás
     if (field.name !== 'nit') {
       return;
     }
@@ -319,6 +354,7 @@ export class FormRuaComponent {
       return;
     }
 
+    // No permitir espacios ni letras en NIT
     if (!/^\d$/.test(event.key)) {
       event.preventDefault();
     }
@@ -494,7 +530,4 @@ export class FormRuaComponent {
     this.statusType = type;
   }
 
-  private applyDarkMode(enabled: boolean): void {
-    document.documentElement.classList.toggle('app-dark', enabled);
-  }
 }

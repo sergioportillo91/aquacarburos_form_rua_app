@@ -56,7 +56,8 @@ export interface FormRuaPayload {
   informeCaracterizacion: string;
   sistemaTratamientoAguasResiduales: string;
   trampaGrasasCaudal: string;
-  caudalEntradaSalidaLs: string;
+  caudalEntradaLs: string;
+  caudalSalidaLs: string;
   pozoSepticoEntradaSalidaAgua: string;
   reporteFiltrosContaminados: string;
   reporteTraposAbsorbentesContaminados: string;
@@ -99,6 +100,7 @@ export interface FormField {
   options?: SelectOption[];
   pattern?: string;
   patternMessage?: string;
+  disabled?: boolean;
 }
 
 export interface DocumentField {
