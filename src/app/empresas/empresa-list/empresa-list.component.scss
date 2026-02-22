@@ -52,4 +52,20 @@
   .p-password {
     width: 100%;
   }
+
+  .p-confirm-dialog .p-button-success {
+    background-color: #22c55e;
+    border: none;
+    color: #fff;
+  }
+
+  .p-confirm-dialog .p-button-secondary {
+    background-color: #e5e7eb;
+    border: none;
+    color: #222;
+  }
+
+  .p-confirm-dialog .p-button-rounded {
+    border-radius: 2rem;
+  }
 }

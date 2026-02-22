@@ -14,7 +14,7 @@ import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { ToastModule } from 'primeng/toast';
 import { MessageService, ConfirmationService } from 'primeng/api';
 import { FormRuaService } from './services/form-rua.service';
-import { FormField, DocumentField, FormRuaPayload } from './models/form-rua.model';
+import { FormField, FormRuaPayload } from './models/form-rua.model';
 import { AuthService } from '../auth/services/auth.service';
 import { UserSession } from '../auth/models/auth.model';
 
@@ -189,28 +189,7 @@ export class FormRuaComponent {
     }
   ];
 
-  readonly documentFields: DocumentField[] = [
-    { key: 'usoSuelo', label: 'Uso del suelo' },
-    { key: 'diagramaActividadPdf', label: 'Diagrama de actividad (PDF del flujo del proceso)' },
-    { key: 'certificadoGeneradorRespel2025', label: 'Certificado de generador de RESPEL año 2025' },
-    { key: 'contratoGestorResiduosPeligrosos', label: 'Contrato con gestor de residuos peligrosos' },
-    { key: 'documentoSoportePdf', label: 'Documento soporte (PDF)' },
-    { key: 'tipoVertimientoDocumento', label: 'Permiso de vertimiento (suelo / alcantarillado)' },
-    { key: 'permisoVertimientosDocumento', label: 'Permiso de vertimientos (vigente / en trámite)' },
-    { key: 'radicadoTramiteVertimientosDocumento', label: 'Radicado del trámite de vertimientos' },
-    { key: 'caracterizacionVertimientosDocumento', label: 'Caracterización de vertimientos' },
-    { key: 'planGestionIntegralResiduosPeligrosos', label: 'Plan de gestión integral de residuos peligrosos' },
-    { key: 'medioAlmacenamientoResiduosPeligrosos', label: 'Medio de almacenamiento de residuos peligrosos' },
-    { key: 'areaDisposicionFinal', label: 'Área de disposición final (evidencia fotográfica)' },
-    { key: 'areaCanopy', label: 'Área del canopy' },
-    { key: 'longitudRejillasPerimetrales', label: 'Longitud de rejillas perimetrales' }
-  ];
-
   formData: Record<string, unknown> = {};
-  docData: Record<string, string> = {};
-  docErrors: Record<string, string> = {};
-  docFileNames: Record<string, string> = {};
-
   statusMessage = '';
   statusType: '' | 'ok' | 'error' = '';
   submitting = false;
@@ -236,12 +215,6 @@ export class FormRuaComponent {
       }
     });
 
-    this.documentFields.forEach((field) => {
-      this.docData[field.key] = '';
-      this.docErrors[field.key] = '';
-      this.docFileNames[field.key] = '';
-    });
-
     this.isAdmin = this.currentUser?.rol === 'ROL_ADMIN';
   }
 
@@ -250,8 +223,10 @@ export class FormRuaComponent {
       message: '¿Estás seguro que deseas cerrar sesión?',
       header: 'Confirmar',
       icon: 'pi pi-exclamation-triangle',
-      acceptLabel: 'Si',
+      acceptLabel: 'Sí',
       rejectLabel: 'No',
+      acceptButtonStyleClass: 'p-button-success p-button-rounded',
+      rejectButtonStyleClass: 'p-button-secondary p-button-rounded',
       accept: () => {
         this.authService.logout();
       }
@@ -264,131 +239,11 @@ export class FormRuaComponent {
 
 
   onNitInput(): void {
-    const nitValue = String(this.formData['nit'] ?? '') || '';
+    const nitValue = typeof this.formData['nit'] === 'string' ? this.formData['nit'] : '';
     this.formData['nit'] = nitValue.replaceAll(/\D/g, '');
   }
 
-  async onPrimeFileSelect(fieldName: string, event: { files?: File[] }): Promise<void> {
-    this.setDocError(fieldName, '');
-    this.setStatus('', '');
-
-    const file = event.files?.[0];
-
-    if (!file) {
-      this.docData[fieldName] = '';
-      this.docFileNames[fieldName] = '';
-      return;
-    }
-
-    const fileName = file.name.toLowerCase();
-    const isAllowedByExtension = fileName.endsWith('.pdf') || fileName.endsWith('.doc') || fileName.endsWith('.docx');
-    const isAllowedByMime = this.acceptedMime.includes(file.type);
-
-    if (!isAllowedByExtension && !isAllowedByMime) {
-      this.docData[fieldName] = '';
-      this.docFileNames[fieldName] = '';
-      this.setDocError(fieldName, 'Debe ser un archivo PDF, DOC o DOCX.');
-      return;
-    }
-
-    if (file.size > this.maxBytes) {
-      this.docData[fieldName] = '';
-      this.docFileNames[fieldName] = '';
-      this.setDocError(fieldName, 'Supera el tamaño máximo permitido de 5MB.');
-      return;
-    }
-
-    try {
-      this.docData[fieldName] = await this.toDataUrl(file);
-      this.docFileNames[fieldName] = file.name;
-    } catch {
-      this.docData[fieldName] = '';
-      this.docFileNames[fieldName] = '';
-      this.setDocError(fieldName, 'No se pudo leer el archivo. Intenta nuevamente.');
-    }
-  }
-
-  onFileClear(fieldName: string): void {
-    this.docData[fieldName] = '';
-    this.docFileNames[fieldName] = '';
-    this.setDocError(fieldName, '');
-  }
-
-  isMissingRequired(field: FormField): boolean {
-    if (!field.required) {
-      return false;
-    }
-
-    const value = this.formData[field.name];
-    if (typeof value === 'string') {
-      return value.trim() === '';
-    }
-
-    return value === null || value === undefined || value === '';
-  }
-
-  onTextValueChange(field: FormField, value: unknown): void {
-    if (!['text', 'email', 'password'].includes(field.type)) {
-      this.formData[field.name] = value;
-      return;
-    }
-
-    // Permitir espacios en todos los campos excepto NIT
-    if (field.name === 'nit') {
-      const sanitized = String(value ?? '').replace(/\D/g, '');
-      this.formData[field.name] = sanitized;
-      this.onNitInput();
-    } else {
-      this.formData[field.name] = value;
-    }
-  }
-
-  onFieldKeyDown(field: FormField, event: KeyboardEvent): void {
-    // Solo restringir caracteres en el campo NIT, permitir espacios en los demás
-    if (field.name !== 'nit') {
-      return;
-    }
-
-    const allowedControlKeys = ['Backspace', 'Delete', 'Tab', 'ArrowLeft', 'ArrowRight', 'Home', 'End'];
-    if (allowedControlKeys.includes(event.key) || event.ctrlKey || event.metaKey) {
-      return;
-    }
-
-    // No permitir espacios ni letras en NIT
-    if (!/^\d$/.test(event.key)) {
-      event.preventDefault();
-    }
-  }
-
-  onFieldPaste(field: FormField, event: ClipboardEvent): void {
-    if (field.name !== 'nit') {
-      return;
-    }
-
-    const pastedText = event.clipboardData?.getData('text') ?? '';
-    if (!/^\d+$/.test(pastedText)) {
-      event.preventDefault();
-    }
-  }
-
-  isFormReady(form: NgForm): boolean {
-    if (!form.valid) {
-      return false;
-    }
-
-    const hasMissingRequiredField = [...this.basicFields, ...this.generalFields]
-      .filter((field) => field.required)
-      .some((field) => this.isMissingRequired(field));
-
-    if (hasMissingRequiredField) {
-      return false;
-    }
-
-    return this.documentFields.every((doc) => Boolean(this.docData[doc.key]));
-  }
-
   async onSubmit(form: NgForm): Promise<void> {
-    this.clearDocErrors();
     this.setStatus('', '');
 
     if (form.invalid) {
@@ -416,25 +271,9 @@ export class FormRuaComponent {
       return;
     }
 
-    let hasDocError = false;
-    this.documentFields.forEach((doc) => {
-      if (!this.docData[doc.key]) {
-        this.setDocError(doc.key, 'Este documento es obligatorio.');
-        hasDocError = true;
-      }
-    });
-
-    if (hasDocError) {
-      this.setStatus('Debes cargar los documentos obligatorios para continuar.', 'error');
-      return;
-    }
-
     const payload: Record<string, unknown> = {};
     [...this.basicFields, ...this.generalFields].forEach((field) => {
       payload[field.name] = this.parseValue(field.name, this.formData[field.name] ?? '');
-    });
-    this.documentFields.forEach((doc) => {
-      payload[doc.key] = this.docData[doc.key] || null;
     });
 
     this.submitting = true;
@@ -462,15 +301,24 @@ export class FormRuaComponent {
   }
 
   private resetForm(form: NgForm): void {
+    // Guardar los valores antes de resetear el formulario
+    const nit = this.formData['nit'];
+    const nombreEmpresa = this.formData['nombreEmpresa'];
     form.resetForm();
     [...this.basicFields, ...this.generalFields].forEach((field) => {
-      this.formData[field.name] = null;
+      if (field.name !== 'nit' && field.name !== 'nombreEmpresa') {
+        this.formData[field.name] = null;
+      }
     });
-    this.documentFields.forEach((doc) => {
-      this.docData[doc.key] = '';
-      this.docErrors[doc.key] = '';
-      this.docFileNames[doc.key] = '';
-    });
+    this.formData['nit'] = nit;
+    this.formData['nombreEmpresa'] = nombreEmpresa;
+    // Reasignar los valores a los controles del formulario para inputs deshabilitados
+    if (form.controls['nit']) {
+      form.controls['nit'].setValue(nit);
+    }
+    if (form.controls['nombreEmpresa']) {
+      form.controls['nombreEmpresa'].setValue(nombreEmpresa);
+    }
     this.setStatus('', '');
   }
 
@@ -478,33 +326,28 @@ export class FormRuaComponent {
     if (value === '' || value === null || value === undefined) {
       return null;
     }
-
     if (value instanceof Date) {
       const year = value.getFullYear();
       const month = `${value.getMonth() + 1}`.padStart(2, '0');
       const day = `${value.getDate()}`.padStart(2, '0');
       return `${year}-${month}-${day}`;
     }
-
     if (name === 'nit') {
-      return String(value).replace(/\D/g, '');
+      return typeof value === 'string' ? value.replaceAll(/\D/g, '') : '';
     }
-
     if (['areaTotalMetrosCuadrados', 'promedioHorasDiaFuncionamiento', 'numeroEmpleados'].includes(name)) {
       return Number(value);
     }
-
     if (['tieneSistemaTratamiento', 'realizaEmisionesAire', 'aprovechamientoForestal'].includes(name)) {
       return value === 'true';
     }
-
-    return String(value);
+    return typeof value === 'string' ? value : '';
   }
 
   private toDataUrl(file: File): Promise<string> {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
-      reader.onload = () => resolve(String(reader.result ?? ''));
+      reader.onload = () => resolve(typeof reader.result === 'string' ? reader.result : '');
       reader.onerror = () => reject(new Error('No se pudo leer el archivo'));
       reader.readAsDataURL(file);
     });
@@ -515,19 +358,36 @@ export class FormRuaComponent {
     return emailPattern.test(email);
   }
 
-  private setDocError(field: string, message: string): void {
-    this.docErrors[field] = message;
-  }
-
-  private clearDocErrors(): void {
-    this.documentFields.forEach((doc) => {
-      this.docErrors[doc.key] = '';
-    });
-  }
-
   private setStatus(message: string, type: '' | 'ok' | 'error'): void {
     this.statusMessage = message;
     this.statusType = type;
   }
 
+  // Métodos requeridos por el template
+  isMissingRequired(field: FormField): boolean {
+    if (!field.required) {
+      return false;
+    }
+    const value = this.formData[field.name];
+    if (typeof value === 'string') {
+      return value.trim() === '';
+    }
+    return value === null || value === undefined || value === '';
+  }
+
+  onTextValueChange(field: FormField, value: unknown): void {
+    this.formData[field.name] = value;
+  }
+
+  onFieldKeyDown(field: FormField, event: KeyboardEvent): void {
+    // Puedes agregar lógica de validación aquí si lo necesitas
+  }
+
+  onFieldPaste(field: FormField, event: ClipboardEvent): void {
+    // Puedes agregar lógica de validación aquí si lo necesitas
+  }
+
+  isFormReady(form: NgForm): boolean {
+    return !!form.valid;
+  }
 }

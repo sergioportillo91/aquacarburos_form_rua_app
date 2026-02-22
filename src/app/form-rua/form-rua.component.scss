@@ -44,3 +44,32 @@
   font-size: 0.875rem;
 }
 
+:host ::ng-deep .p-confirm-dialog .p-dialog-content {
+  font-family: Segoe UI, Roboto, Arial, sans-serif;
+  font-size: 1.1rem;
+  color: #222;
+}
+
+:host ::ng-deep .p-confirm-dialog .p-dialog-header {
+  font-family: Segoe UI, Roboto, Arial, sans-serif;
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: #0d9488;
+}
+
+:host ::ng-deep .p-confirm-dialog .p-button-success {
+  background-color: #22c55e;
+  border: none;
+  color: #fff;
+}
+
+:host ::ng-deep .p-confirm-dialog .p-button-secondary {
+  background-color: #e5e7eb;
+  border: none;
+  color: #222;
+}
+
+:host ::ng-deep .p-confirm-dialog .p-button-rounded {
+  border-radius: 2rem;
+}
+

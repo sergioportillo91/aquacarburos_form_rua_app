@@ -222,36 +222,6 @@
         </div>
       </section>
 
-      <section class="surface-card border-1 border-200 border-round p-3 md:p-4">
-        <h2 class="text-xl font-semibold mt-0 mb-3" style="letter-spacing: -0.3px; font-weight: 600; line-height: 1.4;">Documentos (PDF/Word, máx 5MB)</h2>
-        <div class="grid">
-          <div class="col-12 md:col-6" *ngFor="let doc of documentFields">
-            <label class="block font-medium mb-2" [for]="doc.key" style="font-size: 0.95rem;">{{ doc.label }}<span class="text-red-500"> *</span></label>
-            <div class="flex align-items-center gap-2 flex-wrap">
-              <p-fileUpload
-                mode="basic"
-                chooseIcon="pi pi-upload"
-                chooseLabel="Seleccionar archivo"
-                [name]="doc.key + 'File'"
-                [accept]="acceptedFileTypes"
-                [maxFileSize]="5242880"
-                [customUpload]="true"
-                [auto]="true"
-                [multiple]="false"
-                (onSelect)="onPrimeFileSelect(doc.key, $event)"
-                (onClear)="onFileClear(doc.key)"
-              ></p-fileUpload>
-              <div class="file-name" *ngIf="docFileNames[doc.key]">
-                <i class="pi pi-file"></i>
-                <span class="file-name-text" [title]="docFileNames[doc.key]">{{ docFileNames[doc.key] }}</span>
-              </div>
-            </div>
-            <small class="block mt-2 text-600">Acepta PDF. Máximo 5MB.</small>
-            <small class="block mt-1 text-red-500">{{ docErrors[doc.key] }}</small>
-          </div>
-        </div>
-      </section>
-
       <div class="flex flex-column align-items-center gap-2">
         <button
           pButton

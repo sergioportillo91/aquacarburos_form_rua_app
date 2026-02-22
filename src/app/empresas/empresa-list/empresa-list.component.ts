@@ -337,8 +337,10 @@ export class EmpresaListComponent implements OnInit {
       message: '¿Estás seguro que deseas cerrar sesión?',
       header: 'Confirmar',
       icon: 'pi pi-exclamation-triangle',
-      acceptLabel: 'Si',
+      acceptLabel: 'Sí',
       rejectLabel: 'No',
+      acceptButtonStyleClass: 'p-button-success p-button-rounded',
+      rejectButtonStyleClass: 'p-button-secondary p-button-rounded',
       accept: () => {
         this.authService.logout();
       }
