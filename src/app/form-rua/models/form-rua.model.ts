@@ -65,17 +65,19 @@ export interface FormRuaPayload {
   realizaEmisionesAire: string;
   aprovechamientoForestal: string;
 
+  // Nuevos campos solicitados
+  usoSuelo: string; // Uso del suelo (texto)
+  diagramaActividadPdf: string | null; // Diagrama de flujo (si/no, archivo PDF)
+  certificadoGeneradorRespel2025: string | null; // Certificado respel (si/no, archivo PDF)
+  planGestionIntegralResiduosPeligrosos: string; // ¿Cómo se gestiona la recolección de residuos peligrosos? (texto)
+
   // Documentos (Base64)
-  usoSuelo: string | null;
-  diagramaActividadPdf: string | null;
-  certificadoGeneradorRespel2025: string | null;
   contratoGestorResiduosPeligrosos: string | null;
   documentoSoportePdf: string | null;
   tipoVertimientoDocumento: string | null;
   permisoVertimientosDocumento: string | null;
   radicadoTramiteVertimientosDocumento: string | null;
   caracterizacionVertimientosDocumento: string | null;
-  planGestionIntegralResiduosPeligrosos: string | null;
   medioAlmacenamientoResiduosPeligrosos: string | null;
   areaDisposicionFinal: string | null;
   longitudRejillasPerimetrales: string | null;

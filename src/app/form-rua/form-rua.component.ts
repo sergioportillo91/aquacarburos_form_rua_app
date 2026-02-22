@@ -69,8 +69,8 @@ export class FormRuaComponent {
 
   readonly generalFields: FormField[] = [
     { name: 'numeroSemanasFuncionamientoPeriodoBalance', label: 'N° semanas funcionamiento', placeholder: 'N° semanas funcionamiento', type: 'text', required: true },
-    { name: 'promedioNumeroDiasSemanaFuncionamiento', label: 'Promedio días/semana', placeholder: 'Promedio días/semana', type: 'text', required: true },
-    { name: 'promedioNumeroTurnosDia', label: 'Promedio turnos/día', placeholder: 'Promedio turnos/día', type: 'text', required: true },
+    { name: 'promedioNumeroDiasSemanaFuncionamiento', label: 'Promedio horas/semana', placeholder: 'Promedio días/semana', type: 'text', required: true },
+    { name: 'promedioNumeroTurnosDia', label: 'Promedio turnos/día', placeholder: 'Promedio turnos/día (informacion sgsst)', type: 'text', required: true },
     {
       name: 'tipoTramite',
       label: 'Tipo de trámite',
@@ -176,18 +176,23 @@ export class FormRuaComponent {
         { label: 'No', value: 'false' }
       ]
     },
-    {
-      name: 'aprovechamientoForestal',
-      label: '¿Aprovechamiento forestal?',
-      type: 'select',
-      required: true,
-      options: [
-        { label: 'Seleccione una opción', value: '' },
-        { label: 'Sí', value: 'true' },
-        { label: 'No', value: 'false' }
-      ]
-    }
-  ];
+    
+      { name: 'aprovechamientoForestal',
+        label: '¿Aprovechamiento forestal?',
+        type: 'select',
+        required: true,
+        options: [
+          { label: 'Seleccione una opción', value: '' },
+          { label: 'Sí', value: 'true' },
+          { label: 'No', value: 'false' }
+        ]
+      },
+      // Nuevos campos solicitados
+      { name: 'usoSuelo', label: 'Uso del suelo', placeholder: 'Describe el uso del suelo', type: 'text', required: true },
+      { name: 'diagramaActividadPdf', label: '¿Diagrama de actividad?', type: 'select', required: true, options: [ { label: 'Seleccione una opción', value: '' }, { label: 'Sí', value: 'SI' }, { label: 'No', value: 'NO' } ] },
+      { name: 'certificadoGeneradorRespel2025', label: '¿Certificado de generador de RESPEL año 2025?', type: 'select', required: true, options: [ { label: 'Seleccione una opción', value: '' }, { label: 'Sí', value: 'SI' }, { label: 'No', value: 'NO' } ] },
+      { name: 'planGestionIntegralResiduosPeligrosos', label: '¿Cómo se gestiona la recolección de residuos peligrosos?', placeholder: 'Describa la gestión de residuos peligrosos', type: 'text', required: true }
+    ];
 
   formData: Record<string, unknown> = {};
   statusMessage = '';
