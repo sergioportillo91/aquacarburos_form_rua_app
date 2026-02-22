@@ -91,6 +91,7 @@
         currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} empresas"
         styleClass="p-datatable-striped"
         [tableStyle]="{ 'min-width': '60rem' }"
+        [loading]="loading"
       >
         <ng-template pTemplate="header">
           <tr>
