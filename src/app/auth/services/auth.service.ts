@@ -3,7 +3,7 @@ import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Observable, throwError, BehaviorSubject } from 'rxjs';
 import { catchError, tap } from 'rxjs/operators';
 import { Router } from '@angular/router';
-import { environment } from '../../../environments/environment';
+import { environment } from '../../../environments/environment.prod';
 import { LoginRequest, LoginResponse, UserSession } from '../models/auth.model';
 
 @Injectable({

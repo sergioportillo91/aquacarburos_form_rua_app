@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
-import { environment } from '../../../environments/environment';
+import { environment } from '../../../environments/environment.prod';
 import { AuthService } from '../../auth/services/auth.service';
 import { Empresa, EmpresaFilter, PageResponse } from '../models/empresa.model';
 
@@ -10,7 +10,7 @@ import { Empresa, EmpresaFilter, PageResponse } from '../models/empresa.model';
   providedIn: 'root'
 })
 export class EmpresaService {
-  private readonly apiUrl = `${environment.apiUrl.replace(/\/form-rua$/, '')}/empresas`;
+  private readonly apiUrl = environment.empresasUrl;
 
   constructor(
     private readonly http: HttpClient,

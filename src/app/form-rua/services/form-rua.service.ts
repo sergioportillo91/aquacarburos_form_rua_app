@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
 import { Observable, throwError, timeout, TimeoutError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
-import { environment } from '../../../environments/environment';
+import { environment } from '../../../environments/environment.prod';
 import { FormRuaPayload, FormRuaResponse } from '../models/form-rua.model';
 import { AuthService } from '../../auth/services/auth.service';
 

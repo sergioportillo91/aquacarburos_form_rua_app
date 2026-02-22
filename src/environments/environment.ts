@@ -1,5 +1,6 @@
 export const environment = {
   production: false,
   apiUrl: 'http://localhost:8099/api/v1/form-rua',
-  authUrl: 'http://localhost:8099/api/v1/auth'
+  authUrl: 'http://localhost:8099/api/v1/auth',
+  empresasUrl: 'http://localhost:8099/api/v1/empresas'
 };
