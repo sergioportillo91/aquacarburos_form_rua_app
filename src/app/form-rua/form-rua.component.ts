@@ -70,7 +70,7 @@ export class FormRuaComponent {
   readonly generalFields: FormField[] = [
     { name: 'numeroSemanasFuncionamientoPeriodoBalance', label: 'N° semanas funcionamiento', placeholder: 'N° semanas funcionamiento', type: 'text', required: true },
     { name: 'promedioNumeroDiasSemanaFuncionamiento', label: 'Promedio horas/semana', placeholder: 'Promedio días/semana', type: 'text', required: true },
-    { name: 'promedioNumeroTurnosDia', label: 'Promedio turnos/día', placeholder: 'Promedio turnos/día (informacion sgsst)', type: 'text', required: true },
+    { name: 'promedioNumeroTurnosDia', label: 'Promedio turnos/día (información sgsst)', placeholder: 'Promedio turnos/día (información sgsst)', type: 'text', required: true },
     {
       name: 'tipoTramite',
       label: 'Tipo de trámite',
